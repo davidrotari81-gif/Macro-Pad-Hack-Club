@@ -3,7 +3,8 @@ This is my first time creating a macropad and also the first doing something lik
 
 
 # Features 
-it shows you the flags in asseto corsa competitione (ACC) 
+it shows you the flags in asseto corsa competitione (ACC) using leds and the OLED display
+it also can be used as a normal macropad
 
 
 # Components 
