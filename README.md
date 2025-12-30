@@ -2,6 +2,10 @@
 This is my first time creating a macropad and also the first doing something like PCB, Coding, And design (it hurted like hell)
 
 
+# Features 
+it shows you the flags in asseto corsa competitione (ACC) 
+
+
 # Components 
 9x SK6812 MINI-E LEDs
 1x 0.91 inch OLED displays
@@ -23,3 +27,5 @@ CAD design (is the worst part of the project cause i was running out of time 30/
 
 # Firmware
  I will use arduino because i ned the leds to colour by the color of the flags in ACC
+
+
