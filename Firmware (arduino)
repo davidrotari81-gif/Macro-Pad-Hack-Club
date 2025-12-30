@@ -1,16 +1,24 @@
 #include <Keyboard.h>
 #include <Adafruit_NeoPixel.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+/* ================= OLED ================= */
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define OLED_RESET -1
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 /* ================= LEDS ================= */
 #define LED_PIN   26
 #define LED_COUNT 9
-
 Adafruit_NeoPixel leds(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 /* ================= MATRIZ ================= */
-// Ajusta estos pines si en tu PCB son distintos
-uint8_t rowPins[4] = {1, 2, 3, 4};       // Row 0 → Row 3
-uint8_t colPins[3] = {27, 28, 29};       // Col 0 → Col 2
+// Ajusta si tus pines reales son distintos
+uint8_t rowPins[4] = {1, 2, 3, 4};
+uint8_t colPins[3] = {27, 28, 29};
 
 /* ================= HID F13–F24 ================= */
 #define KEY_F13  0x68
@@ -43,6 +51,7 @@ String serialCmd = "";
 void setup() {
   Serial.begin(115200);
   Keyboard.begin();
+  Wire.begin();
 
   // Filas
   for (int r = 0; r < 4; r++) {
@@ -59,6 +68,18 @@ void setup() {
   leds.begin();
   leds.clear();
   leds.show();
+
+  // OLED
+  if (display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    display.clearDisplay();
+    display.setTextColor(SSD1306_WHITE);
+    display.setCursor(0, 0);
+    display.setTextSize(1);
+    display.println("ACC MACROPAD");
+    display.println();
+    display.println("Waiting data...");
+    display.display();
+  }
 }
 
 void loop() {
@@ -89,7 +110,7 @@ void sendKey(int r, int c) {
   Keyboard.releaseAll();
 }
 
-/* ================= SERIAL → LEDS ================= */
+/* ================= SERIAL → LEDS + OLED ================= */
 void readSerial() {
   while (Serial.available()) {
     char ch = Serial.read();
@@ -105,12 +126,30 @@ void readSerial() {
 void handleCommand(String c) {
   c.trim();
 
-  if (c == "GREEN")       setColor(0, 255, 0);
-  else if (c == "YELLOW") setColor(255, 150, 0);
-  else if (c == "RED")    setColor(255, 0, 0);
-  else if (c == "BLUE")   setColor(0, 0, 255);
-  else if (c == "WHITE")  setColor(255, 255, 255);
-  else if (c == "BLACK")  setColor(0, 0, 0);
+  if (c == "GREEN") {
+    setColor(0, 255, 0);
+    showFlag("GREEN");
+  }
+  else if (c == "YELLOW") {
+    setColor(255, 150, 0);
+    showFlag("YELLOW");
+  }
+  else if (c == "RED") {
+    setColor(255, 0, 0);
+    showFlag("RED");
+  }
+  else if (c == "BLUE") {
+    setColor(0, 0, 255);
+    showFlag("BLUE");
+  }
+  else if (c == "WHITE") {
+    setColor(255, 255, 255);
+    showFlag("WHITE");
+  }
+  else if (c == "BLACK") {
+    setColor(0, 0, 0);
+    showFlag("BLACK");
+  }
 }
 
 void setColor(uint8_t r, uint8_t g, uint8_t b) {
@@ -118,4 +157,17 @@ void setColor(uint8_t r, uint8_t g, uint8_t b) {
     leds.setPixelColor(i, leds.Color(r, g, b));
   }
   leds.show();
+}
+
+/* ================= OLED ================= */
+void showFlag(const char* flag) {
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.setTextSize(1);
+  display.println("ACC MACROPAD");
+  display.println();
+  display.setTextSize(2);
+  display.println("FLAG:");
+  display.println(flag);
+  display.display();
 }
